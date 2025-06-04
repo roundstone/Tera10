@@ -6,6 +6,7 @@ import DashboardPropertyTable from "./children/dashboard-propety-table";
 import { ROUTES } from "@/config/route";
 // import { useNavigation } from "@/utils/navigation";
 import { Link } from "react-router-dom";
+import UnlockCard from "./children/unlock-card";
 
 const stats = [
   {
@@ -71,23 +72,7 @@ const DeveloperDashboardPage = () => {
             <DashboardPropertyTable />
             {/* Promo Banner */}
             <div>
-              <div className="w-80 md:w-full bg-gray-900 h-[595px] rounded-lg overflow-hidden relative lg:flex flex-col hidden">
-                <div className="flex-1 p-6 pt-64 flex flex-col justify-end text-white">
-                  <h3 className="text-4xl font-normal mb-2">
-                    Unlock Your Project's Potential with Tera10!
-                  </h3>
-                  <Button className="mt-4 rounded-full text-black self-start">
-                    List an asset
-                  </Button>
-                </div>
-                <div className="absolute top-0 right-0 left-0 h-64 bg-gradient-to-b from-black/20 to-transparent">
-                  {/* <img
-              src="/api/placeholder/320/240"
-              alt="Developer with building models"
-              className="w-full h-full object-cover object-center"
-            /> */}
-                </div>
-              </div>
+              <UnlockCard />
             </div>
           </div>
         </div>

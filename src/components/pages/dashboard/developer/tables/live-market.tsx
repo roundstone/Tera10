@@ -11,7 +11,8 @@ export const propertyData: PropertyData[] = [
     stockStatus: "IN STOCK",
     sold: 827,
     unitPrice: 120000,
-    marketChange: "+16.2%",
+    marketChange: "+16.2%", 
+    developer: "Hecarters",
   },
   {
     id: 2,
@@ -21,6 +22,7 @@ export const propertyData: PropertyData[] = [
     sold: 827,
     unitPrice: 120000,
     marketChange: "+9%",
+    developer: "Hecarters",
   },
   {
     id: 3,
@@ -30,6 +32,7 @@ export const propertyData: PropertyData[] = [
     sold: 827,
     unitPrice: 120000,
     marketChange: "+12%",
+    developer: "Cosgroove",
   },
   {
     id: 4,
@@ -39,6 +42,7 @@ export const propertyData: PropertyData[] = [
     sold: 827,
     unitPrice: 120000,
     marketChange: "+16.2%",
+    developer: "Cosgroove",
   },
   {
     id: 5,
@@ -48,6 +52,7 @@ export const propertyData: PropertyData[] = [
     sold: 827,
     unitPrice: 120000,
     marketChange: "+16.2%",
+    developer: "Cosgroove",
   },
   {
     id: 6,
@@ -57,6 +62,7 @@ export const propertyData: PropertyData[] = [
     sold: 827,
     unitPrice: 120000,
     marketChange: "+16.2%",
+    developer: "Cosgroove",
   },
   {
     id: 7,
@@ -66,6 +72,7 @@ export const propertyData: PropertyData[] = [
     sold: 827,
     unitPrice: 120000,
     marketChange: "+16.2%",
+    developer: "Cosgroove",
   },
   {
     id: 8,
@@ -75,6 +82,7 @@ export const propertyData: PropertyData[] = [
     sold: 827,
     unitPrice: 120000,
     marketChange: "+16.2%",
+    developer: "Cosgroove",
   },
   {
     id: 9,
@@ -84,6 +92,7 @@ export const propertyData: PropertyData[] = [
     sold: 827,
     unitPrice: 120000,
     marketChange: "+16.2%",
+    developer: "Cosgroove",
   },
 ];
 
@@ -96,6 +105,7 @@ export const cosgrovePropertyData: PropertyData[] = [
     sold: 827,
     unitPrice: 120000,
     marketChange: "+16.2%",
+    developer: "Cosgroove",
   },
   {
     id: 2,
@@ -105,7 +115,8 @@ export const cosgrovePropertyData: PropertyData[] = [
     sold: 827,
     unitPrice: 120000,
     marketChange: "+9%",
-  },
+    developer: "Cosgroove",
+      },
   {
     id: 3,
     property: "Cosgrove Harborview Mixed-Use Complex",
@@ -114,6 +125,7 @@ export const cosgrovePropertyData: PropertyData[] = [
     sold: 827,
     unitPrice: 120000,
     marketChange: "+12%",
+    developer: "Cosgroove",
   },
   {
     id: 4,
@@ -123,6 +135,7 @@ export const cosgrovePropertyData: PropertyData[] = [
     sold: 827,
     unitPrice: 120000,
     marketChange: "+16.2%",
+    developer: "Cosgroove",
   },
   {
     id: 5,
@@ -132,6 +145,7 @@ export const cosgrovePropertyData: PropertyData[] = [
     sold: 827,
     unitPrice: 120000,
     marketChange: "+16.2%",
+    developer: "Cosgroove",
   },
   {
     id: 6,
@@ -141,6 +155,7 @@ export const cosgrovePropertyData: PropertyData[] = [
     sold: 827,
     unitPrice: 120000,
     marketChange: "+16.2%",
+    developer: "Cosgroove",
   },
   {
     id: 7,
@@ -150,6 +165,7 @@ export const cosgrovePropertyData: PropertyData[] = [
     sold: 827,
     unitPrice: 120000,
     marketChange: "+16.2%",
+    developer: "Bilad",
   },
   {
     id: 8,
@@ -159,6 +175,7 @@ export const cosgrovePropertyData: PropertyData[] = [
     sold: 827,
     unitPrice: 120000,
     marketChange: "+16.2%",
+    developer: "Bilad",
   },
   {
     id: 9,
@@ -168,6 +185,7 @@ export const cosgrovePropertyData: PropertyData[] = [
     sold: 827,
     unitPrice: 120000,
     marketChange: "+16.2%",
+    developer: "Bilad",
   },
 ];
 

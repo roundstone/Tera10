@@ -1,5 +1,7 @@
+import ManageMarketPage from "@/components/pages/dashboard/fund-manager/market";
+
 function Market() {
-  return <div>Market</div>;
+  return <ManageMarketPage />;
 }
 
 export default Market;

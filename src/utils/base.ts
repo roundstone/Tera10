@@ -24,7 +24,6 @@ export function objectToFormData<T extends Record<string, unknown>>(
   return formData;
 }
 
-
 const SECRET_KEY = config.secretKey || "default_secret_key";
 
 export const encryptData = (data: string) => {
@@ -60,8 +59,9 @@ export const getTimeAgo = (date: Date | string): string => {
 };
 
 // Helper function to check for valid non-empty values
-export const isValidValue = (value: string | number | boolean | null | undefined) =>
-  value !== null && value !== undefined && value !== "";
+export const isValidValue = (
+  value: string | number | boolean | null | undefined
+) => value !== null && value !== undefined && value !== "";
 
 export const formatKey = (key: string) => {
   return key
@@ -69,7 +69,9 @@ export const formatKey = (key: string) => {
     .replace(/(?:^|\s)\S/g, (char) => char.toUpperCase()); // Capitalize words
 };
 
-export const renderValue = (value: string | number | boolean | null | undefined) => {
+export const renderValue = (
+  value: string | number | boolean | null | undefined
+) => {
   return value;
 };
 
@@ -78,4 +80,21 @@ export const formatCurrency = (value: number) => {
     style: "currency",
     currency: "NGN",
   }).format(value);
+};
+
+// Format number with commas
+export const formatNumber = (num: number) => {
+  return num.toLocaleString();
+};
+
+// Format large numbers
+export const formatLargeNumber = (num: number) => {
+  if (num >= 1000000000) {
+    return `₦${(num / 1000000000).toFixed(1)}B`;
+  } else if (num >= 1000000) {
+    return `₦${(num / 1000000).toFixed(1)}M`;
+  } else if (num >= 1000) {
+    return `₦${(num / 1000).toFixed(1)}K`;
+  }
+  return `₦${num}`;
 };

@@ -7,4 +7,5 @@ export interface PropertyData {
   sold: number;
   unitPrice: number;
   marketChange: string;
+  developer: string;
 }

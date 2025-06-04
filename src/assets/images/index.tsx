@@ -15,6 +15,8 @@ import VectorCriclesPattern from "./vector-circles-pattern.svg";
 import EmailBird from "./email-bird.png";
 import ConsoleBG from "./console-bg.png";
 import ThankyouBg from "./thank-you-bg.png";
+import Message from "./message.png";
+
 //
 
 const IMAGES = {
@@ -35,6 +37,7 @@ const IMAGES = {
   EmailBird,
   ConsoleBG,
   ThankyouBg,
+  Message,
 };
 
 export default IMAGES;

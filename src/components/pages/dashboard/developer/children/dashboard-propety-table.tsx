@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -26,46 +27,66 @@ import MarketStats from "../modals/market-stats";
 
 // export default class DashboardPropertyTable
 const DashboardPropertyTable = () => {
+  // Custom hook for table state management
+  const useTableState = () => {
+    const [sorting, setSorting] = React.useState<SortingState>([]);
+    const [columnFilters, setColumnFilters] =
+      React.useState<ColumnFiltersState>([]);
+    const [columnVisibility, setColumnVisibility] =
+      React.useState<VisibilityState>({});
+    const [rowSelection, setRowSelection] = React.useState({});
+
+    return {
+      sorting,
+      setSorting,
+      columnFilters,
+      setColumnFilters,
+      columnVisibility,
+      setColumnVisibility,
+      rowSelection,
+      setRowSelection,
+    };
+  };
+
+  // Custom hook to create table configuration
+  const useTable = (
+    data: any[],
+    columns: any[],
+    tableState: ReturnType<typeof useTableState>
+  ) => {
+    return useReactTable({
+      data,
+      columns,
+      onSortingChange: tableState.setSorting,
+      onColumnFiltersChange: tableState.setColumnFilters,
+      getCoreRowModel: getCoreRowModel(),
+      getPaginationRowModel: getPaginationRowModel(),
+      getSortedRowModel: getSortedRowModel(),
+      getFilteredRowModel: getFilteredRowModel(),
+      onColumnVisibilityChange: tableState.setColumnVisibility,
+      onRowSelectionChange: tableState.setRowSelection,
+      state: {
+        sorting: tableState.sorting,
+        columnFilters: tableState.columnFilters,
+        columnVisibility: tableState.columnVisibility,
+        rowSelection: tableState.rowSelection,
+      },
+    });
+  };
+
+  // Optimized component code
   const [search, setSearch] = React.useState("");
-
-  // Table 1 (All)
-  const [sorting1, setSorting1] = React.useState<SortingState>([]);
-  const [columnFilters1, setColumnFilters1] =
-    React.useState<ColumnFiltersState>([]);
-  const [columnVisibility1, setColumnVisibility1] =
-    React.useState<VisibilityState>({});
-  const [rowSelection1, setRowSelection1] = React.useState({});
-
-  // Table 2 (Cosgroove)
-  const [sorting2, setSorting2] = React.useState<SortingState>([]);
-  const [columnFilters2, setColumnFilters2] =
-    React.useState<ColumnFiltersState>([]);
-  const [columnVisibility2, setColumnVisibility2] =
-    React.useState<VisibilityState>({});
-  const [rowSelection2, setRowSelection2] = React.useState({});
   const [open, setOpen] = React.useState(false);
   const [selectedProperty, setSelectedProperty] = React.useState<string | null>(
     null
   );
 
-  const table = useReactTable({
-    data: propertyData,
-    columns,
-    onSortingChange: setSorting1,
-    onColumnFiltersChange: setColumnFilters1,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility1,
-    onRowSelectionChange: setRowSelection1,
-    state: {
-      sorting: sorting1,
-      columnFilters: columnFilters1,
-      columnVisibility: columnVisibility1,
-      rowSelection: rowSelection1,
-    },
-  });
+  // Table states using the custom hook
+  const table1State = useTableState();
+  const table2State = useTableState();
+
+  // Table configurations
+  const table = useTable(propertyData, columns, table1State);
 
   const columns2 = cosgroveColumns({
     onOpen: (property: string) => {
@@ -74,25 +95,7 @@ const DashboardPropertyTable = () => {
     },
   });
 
-  const table2 = useReactTable({
-    data: cosgrovePropertyData,
-    columns: columns2,
-    onSortingChange: setSorting2,
-    onColumnFiltersChange: setColumnFilters2,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility2,
-    onRowSelectionChange: setRowSelection2,
-    state: {
-      sorting: sorting2,
-      columnFilters: columnFilters2,
-      columnVisibility: columnVisibility2,
-      rowSelection: rowSelection2,
-    },
-  });
-
+  const table2 = useTable(cosgrovePropertyData, columns2, table2State);
   return (
     <div className="col-span-3">
       {/* Tabs */}
