@@ -1,18 +1,13 @@
-import { useState } from "react";
-import { Switch } from "@/components/ui/switch"; // use your UI library or make a custom one
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { CloseCircle, Messages } from "iconsax-react";
+import { Messages } from "iconsax-react";
 import IMAGES from "@/assets/images";
 
-const ReviewMilestone = () => {
-  const [deliveryQuality, setDeliveryQuality] = useState(true);
-  const [milestoneAlignment, setMilestoneAlignment] = useState(false);
-  const [timelineConsistency, setTimelineConsistency] = useState(true);
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import FieldReport from "../children/field-report";
+import ProjectReviewForm from "../children/project-review-form";
 
+const ReviewMilestone = () => {
   return (
-    <div className="flex gap-3">
+    <div className="flex gap-3 max-h-[937px] overflow-auto">
       {/* Left Column */}
       <div className="w-1/2 ">
         <h2 className="text-lg font-medium mb-4">Review Milestone</h2>
@@ -125,74 +120,29 @@ const ReviewMilestone = () => {
             Inspection Report
           </h4>
 
-          <div className="grid grid-cols-3 bg-gray-100 p-2 rounded-lg items-center text-sm mb-2">
-            <div className="font-medium">Delivery quality</div>
-            <div>Passed</div>
-            <Switch
-              checked={deliveryQuality}
-              onCheckedChange={setDeliveryQuality}
-              className="bg-black"
-            />
-          </div>
-
-          <div className="grid grid-cols-3 bg-gray-100 p-2 rounded-lg  items-center self-start text-sm mb-2">
-            <div className="font-medium">Milestone Alignment</div>
-            <div>Not satisfactory</div>
-            <Switch
-              checked={milestoneAlignment}
-              onCheckedChange={setMilestoneAlignment}
-            />
-          </div>
-
-          <div className="grid grid-cols-3 bg-gray-100 p-2 rounded-lg  items-center text-sm mb-4">
-            <div className="font-medium">Timeline Consistency</div>
-            <div>Passed</div>
-            <Switch
-              checked={timelineConsistency}
-              onCheckedChange={setTimelineConsistency}
-            />
-          </div>
-
-          <div className="flex  gap-2 space-y-2 mb-3">
-            <div>
-              <label className="text-xs text-gray-600">Completion rate</label>
-              <Input
-                type="text"
-                value="100%"
-                className="w-full mt-1"
-                readOnly
-              />
-            </div>
-            <div>
-              <label className="text-xs text-gray-600">Amount Payable</label>
-              <Input
-                type="text"
-                value="12,980,291"
-                className="w-full mt-1"
-                readOnly
-              />
-            </div>
-          </div>
-
-          <div className="mb-4">
-            <label className="text-xs text-gray-600">Note</label>
-            <Textarea
-              placeholder="Tell us the activities involved for this project/Milestone"
-              className="w-full mt-1"
-            />
-          </div>
-
-          <div className="flex justify-end gap-2">
-            <Button
-              variant="outline"
-              className="border-gray-300 text-gray-700 rounded-full"
-            >
-              <CloseCircle color="#364153" /> Reject
-            </Button>
-            <Button className="bg-yellow-400 hover:bg-yellow-500 text-black rounded-full">
-              Approve
-            </Button>
-          </div>
+          <Tabs defaultValue="account" className="">
+            <TabsList className="grid w-full grid-cols-2 bg-[#EEEEF0] rounded-md w[788px]">
+              <TabsTrigger
+                value="account"
+                className="data-[state=active]:bg-white data-[state=active]:text-black rounded-md"
+              >
+                Field Report
+              </TabsTrigger>
+              <TabsTrigger
+                value="password"
+                className="data-[state=active]:bg-white data-[state=active]:text-black rounded-md"
+              >
+                {/* <User color="#000" size={15} /> */}
+                <span>Financial</span>
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="account">
+              <FieldReport />
+            </TabsContent>
+            <TabsContent value="password">
+              <ProjectReviewForm />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>
