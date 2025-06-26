@@ -4,6 +4,8 @@ import IMAGES from "@/assets/images";
 
 export function AppDashboardNav() {
   const [app] = useAtom(appAtom);
+  const userEmail = localStorage.getItem('email');
+  const userName = localStorage.getItem('name');
 
   return (
     <nav className="flex justify-between pb10 p-6">
@@ -26,8 +28,8 @@ export function AppDashboardNav() {
           <span className="absolute bottom-1 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></span>
         </div>
         <div className="flex-col gap-2 text-[#475467]">
-          <div className="font-medium text-sm">Cosgrove</div>
-          <div className="text-xs">olivia@cosgroove.ng</div>
+          <div className="font-medium text-sm">{userName}</div>
+          <div className="text-xs">{userEmail}</div>
         </div>
       </div>
     </nav>

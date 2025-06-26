@@ -153,7 +153,7 @@ const DashboardPropertyTable = () => {
             <AppTable
               table={table}
               className=""
-              noResultsMessage="No yellow cards found."
+              noResultsMessage="No records found."
             />
           </div>
           <AppTablePagination table={table} />
@@ -164,7 +164,7 @@ const DashboardPropertyTable = () => {
             <AppTable
               table={table2}
               className=""
-              noResultsMessage="No yellow cards found."
+              noResultsMessage="No records found."
             />
           </div>
           <AppTablePagination table={table} />

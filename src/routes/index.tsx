@@ -7,6 +7,7 @@ import { ROUTES } from "@/config/route";
 import { authRoutes } from "./auth-route";
 import { developerRoutes } from "./developer-route";
 import { managerRoutes } from "./manager-route";
+import RoleBasedRoute from "./rolebase-route";
 
 const AppRoutes = () => {
   // const userType = UserType.SUPERADMIN;
@@ -14,6 +15,7 @@ const AppRoutes = () => {
   return (
     <Router>
       <Routes>
+       
         {authRoutes.map((route, index) => (
           <Route
             key={index}

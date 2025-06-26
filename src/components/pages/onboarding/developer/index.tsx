@@ -15,6 +15,9 @@ import { useNavigation } from "@/utils/navigation";
 import { useForm } from "react-hook-form";
 import IMAGES from "@/assets/images";
 import { ROUTES } from "@/config/route";
+import { useRegistration } from '../../../../context/RegistrationContext';
+import { registrationApi } from '../../../../api/registrationApi';
+import { data } from "react-router-dom";
 
 const EmailSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -22,6 +25,7 @@ const EmailSchema = z.object({
 
 const DeveloperOnboarding = () => {
   const { goTo } = useNavigation();
+  const { state, dispatch } = useRegistration();
 
   const form = useForm<z.infer<typeof EmailSchema>>({
     resolver: zodResolver(EmailSchema),
@@ -30,10 +34,31 @@ const DeveloperOnboarding = () => {
     },
   });
 
-  function onSubmit(data: z.infer<typeof EmailSchema>) {
-    toast.success("Proceeding with email: " + data.email);
-    goTo(ROUTES.ONBOARDING.DEVELOPER.VERIFY_EMAIL);
-  }
+
+  const onSubmit = async (formData: z.infer<typeof EmailSchema>) => {
+    try {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      dispatch({ type: 'SET_ERROR', payload: null });
+
+      const response = await registrationApi.submitStep1(formData.email);
+      console.log("response>>", response.data?.data?.user_id);
+
+      if (response.success) {
+        dispatch({ type: 'SET_STEP_DATA', payload: { step: 1, data: formData } });
+        dispatch({ type: 'SET_CURRENT_STEP', payload: 2 });
+        if (response.data?.data?.user_id) {
+          dispatch({ type: 'SET_USER_ID', payload: response.data?.data?.user_id });
+        }
+        goTo(ROUTES.ONBOARDING.DEVELOPER.VERIFY_EMAIL);
+      } else {
+        dispatch({ type: 'SET_ERROR', payload: response.message });
+      }
+    } catch (error) {
+      dispatch({ type: 'SET_ERROR', payload: 'An error occurred' });
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  };
 
   return (
     <div className="bg-white rounded-2xl w-full border border[#E7E9F1] p-24 h-[673px] z-10 ">
@@ -72,15 +97,26 @@ const DeveloperOnboarding = () => {
           />
 
           <div className="flex justify-end">
-            <Button
-              type="submit"
-              className=" rounded-full bg-yellow-400 text-black hover:bg-yellow-500"
-            >
-              Proceed
-            </Button>
+            {!state.loading ? (
+              <Button
+                type="submit"
+                className="rounded-full bg-yellow-400 text-black hover:bg-yellow-500"
+              >
+                Proceed
+              </Button>
+            ) : (
+              <Button
+                disabled
+                className="rounded-full bg-gray-400 text-white cursor-not-allowed"
+              >
+                Loading...
+              </Button>
+            )}
           </div>
         </form>
       </Form>
+      
+      {state.error && <div className="text-[#ff0000]">{state.error}</div>}
 
       <div className="hidden md:flex  absolute -bottom-30 right-5">
         <img

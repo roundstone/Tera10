@@ -24,7 +24,7 @@ export const basicSchema = z.object({
 export const milestoneSchema = z.object({
   name: z.string().min(1, "Name is required"),
   startDate: z.date({
-    required_error: "A start birth is required.",
+    required_error: "A start date is required.",
   }),
   endDate: z.date({
     required_error: "A end date is required.",

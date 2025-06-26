@@ -159,7 +159,7 @@ const ApprovalTable = () => {
             <AppTable
               table={table}
               className=""
-              noResultsMessage="No yellow cards found."
+              noResultsMessage="no record found."
             />
           </div>
           <AppTablePagination table={table} />
@@ -170,7 +170,7 @@ const ApprovalTable = () => {
             <AppTable
               table={table2}
               className=""
-              noResultsMessage="No yellow cards found."
+              noResultsMessage="no record found."
             />
           </div>
           <AppTablePagination table={table} />
@@ -181,7 +181,7 @@ const ApprovalTable = () => {
             <AppTable
               table={table2}
               className=""
-              noResultsMessage="No yellow cards found."
+              noResultsMessage="no record found."
             />
           </div>
           <AppTablePagination table={table} />

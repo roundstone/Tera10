@@ -15,21 +15,23 @@ import { FileUploader } from "@/components/ui/file";
 import KYCFormHeader from "./form-header";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft } from "iconsax-react";
+import { useRegistration } from '../../../../../context/RegistrationContext';
+import { registrationApi } from '../../../../../api/registrationApi';
 
 // ✅ Correct schema matching the form fields
 const ProjectReadinessSchema = z.object({
-  projectSpecialization: z
+  project_specialization: z
     .string()
     .min(1, "Project specialization is required"),
-  numberCompleted: z
+    completed_project: z
     .number({ invalid_type_error: "Must be a number" })
     .min(1, "Must be at least 1")
     .max(10, "Cannot exceed 10"),
   portfolioDocument: z.any().refine((file) => file?.size <= 800000, {
     message: "File size must be less than 800KB",
   }),
-  aboutDeveloper: z.string().min(1, "Bio/About is required"),
-  portfolioLink: z
+  about: z.string().min(1, "Bio/About is required"),
+  website: z
     .string()
     .url("Must be a valid URL")
     .min(1, "Portfolio link is required"),
@@ -42,21 +44,51 @@ const ProjectReadinessForm = ({
   onFinish: () => void;
   onPrevious: () => void;
 }) => {
+  const { state, dispatch } = useRegistration();
   const form = useForm<z.infer<typeof ProjectReadinessSchema>>({
     resolver: zodResolver(ProjectReadinessSchema),
     defaultValues: {
-      projectSpecialization: "",
-      numberCompleted: 1,
+      project_specialization: "",
+      completed_project: 1,
       portfolioDocument: null,
-      aboutDeveloper: "",
-      portfolioLink: "",
+      about: "",
+      website: "",
     },
   });
 
-  function onSubmit(data: z.infer<typeof ProjectReadinessSchema>) {
-    console.log(data);
-    onFinish();
-  }
+  const onSubmit = async (formData: z.infer<typeof ProjectReadinessSchema>) => {
+    try {
+
+      dispatch({ type: 'SET_LOADING', payload: true });
+      dispatch({ type: 'SET_ERROR', payload: null });
+
+      const data = new FormData();
+      data.append('project_specialization', formData.project_specialization);
+      data.append('completed_project', formData.completed_project.toString());
+      data.append('about', formData.about);
+      data.append('website', formData.website);
+      
+
+
+
+      const response = await registrationApi.submitStep5(state.userId!, formData);
+
+      if (response.success) {
+        dispatch({ type: 'SET_STEP_DATA', payload: { step: 5, data: formData } });
+        dispatch({ type: 'SET_CURRENT_STEP', payload: 5 });
+        //goTo(ROUTES.ONBOARDING.DEVELOPER.VERIFY_EMAIL);
+        onFinish();
+      } else {
+        dispatch({ type: 'SET_ERROR', payload: response.message });
+      }
+    } catch (error) {
+      console.log("error>>", error);
+      dispatch({ type: 'SET_ERROR', payload: 'An error occurred' });
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  };
+
 
   return (
     <div className="py-10">
@@ -70,7 +102,7 @@ const ProjectReadinessForm = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
-              name="projectSpecialization"
+              name="project_specialization"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Project Specialization</FormLabel>
@@ -84,7 +116,7 @@ const ProjectReadinessForm = ({
 
             <FormField
               control={form.control}
-              name="numberCompleted"
+              name="completed_project"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Number of Completed Projects</FormLabel>
@@ -122,7 +154,7 @@ const ProjectReadinessForm = ({
 
           <FormField
             control={form.control}
-            name="aboutDeveloper"
+            name="about"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Brief Bio/About the Developer</FormLabel>
@@ -136,7 +168,7 @@ const ProjectReadinessForm = ({
 
           <FormField
             control={form.control}
-            name="portfolioLink"
+            name="website"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Website or Portfolio Link</FormLabel>

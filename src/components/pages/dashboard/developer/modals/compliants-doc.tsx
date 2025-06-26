@@ -9,13 +9,18 @@ import {
 } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useAsset } from '@/context/AssetContext';
+import { assetApi } from '@/api/assetApi';
 // import { Upload } from "iconsax-react";
 
 const ComplianceDocumentUpload = ({
-  propertyName = "Greenview Apartments",
+  propertyName
+}: {
+  propertyName: string
 }) => {
   const [files, setFiles] = useState<any>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const { state, dispatch } = useAsset();
 
   const handleFileChange = (e: any) => {
     const selectedFiles = Array.from(e.target.files);
@@ -73,32 +78,32 @@ const ComplianceDocumentUpload = ({
                 (
                   file: {
                     name:
+                    | string
+                    | number
+                    | bigint
+                    | boolean
+                    | ReactElement<
+                      unknown,
+                      string | JSXElementConstructor<any>
+                    >
+                    | Iterable<ReactNode>
+                    | ReactPortal
+                    | Promise<
                       | string
                       | number
                       | bigint
                       | boolean
-                      | ReactElement<
-                          unknown,
-                          string | JSXElementConstructor<any>
-                        >
-                      | Iterable<ReactNode>
                       | ReactPortal
-                      | Promise<
-                          | string
-                          | number
-                          | bigint
-                          | boolean
-                          | ReactPortal
-                          | ReactElement<
-                              unknown,
-                              string | JSXElementConstructor<any>
-                            >
-                          | Iterable<ReactNode>
-                          | null
-                          | undefined
-                        >
+                      | ReactElement<
+                        unknown,
+                        string | JSXElementConstructor<any>
+                      >
+                      | Iterable<ReactNode>
                       | null
-                      | undefined;
+                      | undefined
+                    >
+                    | null
+                    | undefined;
                   },
                   index: Key | null | undefined
                 ) => (

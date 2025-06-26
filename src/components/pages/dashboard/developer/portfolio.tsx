@@ -6,7 +6,7 @@ import PortfolioMilestoneTable from "./children/portfolio-milestone-table";
 const stats = [
   {
     title: "Portfolio Balance",
-    value: 12423400,
+    value: 0,
     currency: "NGN",
     icon: <Wallet size={18} color="#000" />,
   },

@@ -27,6 +27,7 @@ import { AppRoutes } from "@/types/route.type";
 import { ROUTES } from "@/config/route";
 import { Link, useLocation } from "react-router-dom";
 import { getUserRoleFromPath } from "@/utils/navigation";
+import { useNavigate } from 'react-router-dom';
 
 // Menu items.
 type MenuItem = {
@@ -66,11 +67,11 @@ const items: MenuItems = {
       to: ROUTES.DASHBOARD.DEVELOPER.WALLET,
       icon: Wallet3,
     },
-    {
-      title: "Profile",
-      to: ROUTES.DASHBOARD.DEVELOPER.PROFILE,
-      icon: User,
-    },
+    // {
+    //   title: "Profile",
+    //   to: ROUTES.DASHBOARD.DEVELOPER.PROFILE,
+    //   icon: User,
+    // },
   ],
   MANAGER: [
     {
@@ -109,10 +110,22 @@ const items: MenuItems = {
 
 export function AppSidebar() {
   const location = useLocation();
+  const navigate = useNavigate(); // to programmatically navigate
   const userRole = getUserRoleFromPath(location.pathname, items); // Extract the role dynamically
   const menuItems = items[userRole] || []; // Get the menu for the role
   const navIsActive = (to: string) => window.location.pathname === to;
   // const navIsActive = (to: string) => window.location.pathname.startsWith(to);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("email");
+    localStorage.removeItem("name");
+    sessionStorage.clear(); // Optionally clear session storage
+
+    navigate(ROUTES.AUTH.LOGIN); // Redirect to login
+
+  };
 
   return (
     <Sidebar className="p-6 bg-[#F6F6F6] !rounded-r-[20px] !border-r-[#E4E4E4]">
@@ -134,7 +147,7 @@ export function AppSidebar() {
                         className={cn(
                           "px-3 py-5",
                           navIsActive(item.to) &&
-                            "!bg-black !font-semibold !text-yellow-500 rounded-md"
+                          "!bg-black !font-semibold !text-yellow-500 rounded-md"
                         )}
                         asChild
                       >
@@ -153,8 +166,13 @@ export function AppSidebar() {
                   <p className="text-gray-500">No menu available</p>
                 )}
                 <div className="text-black pt-80 flex gap-1 items-center">
-                  <Logout color="#000" size={17} />
-                  <Link to={ROUTES.AUTH.LOGIN}>Logout</Link>
+                  <button
+                    onClick={handleLogout}
+                    className="text-black pt-80 flex gap-1 items-center hover:text-yellow-500"
+                  >
+                    <Logout color="#000" size={17} />
+                    Logout
+                  </button>
                 </div>
               </SidebarMenu>
               {/* {userRole.toLocaleLowerCase() !== "admin" && <SecurityAlertCard />} */}
@@ -169,6 +187,7 @@ export function AppSidebar() {
 }
 
 const AppSidebarHeader: React.FC = () => {
+  const userName = localStorage.getItem('name');
   return (
     <div className="p-2 py-4 space-y-10">
       <Link to={"/"} className="flex gap-1 item-center">
@@ -179,7 +198,7 @@ const AppSidebarHeader: React.FC = () => {
         <div className="bg-black rounded-full  h-8 w-8 flex justify-center items-center">
           <img src={IMAGES.CROSGROVE} alt={""} className="h-4" />
         </div>
-        <span>Cosgrove</span>
+        <span>{userName}</span>
       </div>
     </div>
   );

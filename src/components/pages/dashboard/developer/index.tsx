@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import usePageTitle from "@/hooks/use-page-title";
 import { Box, DocumentCopy, DocumentText, Star, Wallet } from "iconsax-react";
@@ -7,34 +8,76 @@ import { ROUTES } from "@/config/route";
 // import { useNavigation } from "@/utils/navigation";
 import { Link } from "react-router-dom";
 import UnlockCard from "./children/unlock-card";
+import { dashboardApi } from "@/api/dashboardApi";
 
-const stats = [
-  {
-    title: "Available Listing",
-    value: 0,
-    icon: <DocumentText size={18} color="#000" />,
-  },
-  {
-    title: "Portfolio Balance",
-    value: 0,
-    currency: "NGN",
-    icon: <Wallet size={18} color="#000" />,
-  },
-  {
-    title: "Units Sold",
-    value: 0,
-    icon: <Box size={18} color="#000" />,
-  },
-  {
-    title: "Pending Milestone Approvals",
-    value: 0,
-    icon: <Star size={18} color="#000" />,
-  },
-];
+
 
 const DeveloperDashboardPage = () => {
   usePageTitle("Developer’s Dashboard");
   // const { goTo } = useNavigation();
+
+  const [stats, setStats] = useState([
+    {
+      title: "Available Listing",
+      value: 0,
+      icon: <DocumentText size={18} color="#000" />,
+    },
+    {
+      title: "Portfolio Balance",
+      value: 0,
+      currency: "NGN",
+      icon: <Wallet size={18} color="#000" />,
+    },
+    {
+      title: "Units Sold",
+      value: 0,
+      icon: <Box size={18} color="#000" />,
+    },
+    {
+      title: "Pending Milestone Approvals",
+      value: 0,
+      icon: <Star size={18} color="#000" />,
+    },
+  ]);
+  const fetchStats = async () => {
+    try {
+      const response = await dashboardApi.getDashboardStats();
+      if (response.success) {
+
+        setStats([
+          {
+            title: "Available Listing",
+            value: response.data?.data.total_assets,
+            icon: <DocumentText size={18} color="#000" />,
+          },
+          {
+            title: "Portfolio Balance",
+            value: 0,
+            currency: "NGN",
+            icon: <Wallet size={18} color="#000" />,
+          },
+          {
+            title: "Units Sold",
+            value: 0,
+            icon: <Box size={18} color="#000" />,
+          },
+          {
+            title: "Pending Milestone Approvals",
+            value: response.data?.data.pending_milestones,
+            icon: <Star size={18} color="#000" />,
+          },
+        ])
+
+
+      }
+    } catch (error) {
+      console.error('Error fetching milestones:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
 
   return (
     <>

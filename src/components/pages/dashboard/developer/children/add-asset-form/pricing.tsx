@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, FormProvider } from "react-hook-form";
 import { z } from "zod";
@@ -15,34 +16,123 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { pricingSchema } from "@/schemas/add-asset-schema";
 import { Calculator } from "iconsax-react";
+import { useAsset } from '@/context/AssetContext';
+import { assetApi } from '@/api/assetApi';
 
 type PricingFormValues = z.infer<typeof pricingSchema>;
 
 export function PricingForm({
   onFinish,
   onPrevious,
+  gotoStep,
 }: {
   onFinish: () => void;
   onPrevious: () => void;
+  gotoStep: (step: number) => void;
 }) {
+  const { state, dispatch } = useAsset();
+  const [editingAssetId, setEditingAssetId] = useState<number | null>(
+    null
+  );
   const form = useForm<PricingFormValues>({
     resolver: zodResolver(pricingSchema),
-    defaultValues: {
-    //   price,
-    //   unitAvailable: 5000,
-    //   maxPerIndividual: 50,
-    //   valuation: {
-    //     entry: 0,
-    //     mid: 0,
-    //     exit: 0,
-    //   },
+    defaultValues: state.formData.step2 || {
+      price: 0,
+      unitAvailable: 0,
+      maxPerIndividual: 0,
+      valuation: {
+        entry: 0,
+        mid: 0,
+        exit: 0,
+      },
     },
   });
 
-  const onSubmit = (data: PricingFormValues) => {
-    console.log("Form submitted: ", data);
-    onFinish();
+
+
+  const onSubmit = async (formData: z.infer<typeof pricingSchema>) => {
+    if (editingAssetId) {
+      try {
+
+        dispatch({ type: 'SET_LOADING', payload: true });
+        dispatch({ type: 'SET_ERROR', payload: null });
+
+        const data = new FormData();
+        data.append('unit_price', formData.price?.toString() || '');
+        data.append('unit_available', formData.unitAvailable?.toString() || '');
+        data.append('max_per_person', formData.maxPerIndividual?.toString() || '');
+        data.append('valuation_entry', formData.valuation.entry?.toString() || '');
+        data.append('valuation_mid', formData.valuation.mid?.toString() || '');
+        data.append('valuation_exit', formData.valuation.exit?.toString() || '');
+
+
+
+        const response = await assetApi.editUnitPrice(editingAssetId, data);
+
+        if (response.success) {
+          dispatch({ type: 'SET_STEP_DATA', payload: { step: 2, data: formData } });
+          dispatch({ type: 'SET_CURRENT_STEP', payload: 3 });
+
+          //goTo(ROUTES.ONBOARDING.DEVELOPER.VERIFY_EMAIL);
+          gotoStep(3);
+        } else {
+          dispatch({ type: 'SET_ERROR', payload: response.message });
+        }
+      } catch (error) {
+        console.log("error>>", error);
+        dispatch({ type: 'SET_ERROR', payload: 'An error occurred' });
+      } finally {
+        dispatch({ type: 'SET_LOADING', payload: false });
+      }
+    }
+    else {
+      try {
+
+        dispatch({ type: 'SET_LOADING', payload: true });
+        dispatch({ type: 'SET_ERROR', payload: null });
+
+        const data = new FormData();
+        data.append('unit_price', formData.price?.toString() || '');
+        data.append('unit_available', formData.unitAvailable?.toString() || '');
+        data.append('max_per_person', formData.maxPerIndividual?.toString() || '');
+        data.append('valuation_entry', formData.valuation.entry?.toString() || '');
+        data.append('valuation_mid', formData.valuation.mid?.toString() || '');
+        data.append('valuation_exit', formData.valuation.exit?.toString() || '');
+
+
+
+        const response = await assetApi.unitPrice(state.assetId!, data);
+
+        if (response.success) {
+          dispatch({ type: 'SET_STEP_DATA', payload: { step: 2, data: formData } });
+          dispatch({ type: 'SET_CURRENT_STEP', payload: 3 });
+
+          //goTo(ROUTES.ONBOARDING.DEVELOPER.VERIFY_EMAIL);
+          onFinish();
+        } else {
+          dispatch({ type: 'SET_ERROR', payload: response.message });
+        }
+      } catch (error) {
+        console.log("error>>", error);
+        dispatch({ type: 'SET_ERROR', payload: 'An error occurred' });
+      } finally {
+        dispatch({ type: 'SET_LOADING', payload: false });
+      }
+    }
   };
+
+  useEffect(() => {
+    if (state.formData.step2) {
+      form.reset(state.formData.step2);
+    }
+  }, [state.formData.step2]);
+
+  useEffect(() => {
+    if (state.editAssetId) {
+      form.reset(state.formData.step2);
+      setEditingAssetId(state.editAssetId)
+    }
+  }, []);
 
   return (
     <FormProvider {...form}>

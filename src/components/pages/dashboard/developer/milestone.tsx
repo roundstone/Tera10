@@ -15,8 +15,11 @@ import {
   SearchNormal,
   Trash,
 } from "iconsax-react";
+import { assetApi } from "@/api/assetApi";
+
 
 interface ProjectPhase {
+  phase_n: number;
   phase: string;
   title: string;
   dateRange: string;
@@ -26,61 +29,72 @@ interface ProjectPhase {
 
 interface MilestoneProps {
   id: string;
-  phase: string;
-  title: string;
-  startDate: Date;
-  endDate: Date;
-  activities?: string;
-  images?: FileList | null;
-  milestones: ProjectPhase[] | null;
+  projectName: string;
+  milestones: ProjectPhase[]
 }
 
-const milestoneData: MilestoneProps[] = [
-  {
-    id: "1",
-    phase: "Phase 1",
-    title: "Project Initiation",
-    startDate: new Date("2025-02-01"),
-    endDate: new Date("2025-02-15"),
-    milestones: [
-      {
-        phase: "Phase 1",
-        title: "Project Initiation",
-        dateRange: "Feb 1, 2025 - Feb 15, 2025",
-        description:
-          "Conduct a thorough site survey and environmental impact assessment to ensure compliance with local regulations and identify any potential environmental concerns.",
-        images: [IMAGES.milestone2, IMAGES.milestone3, IMAGES.milestone1],
-      },
-      {
-        phase: "Phase 2",
-        title: "Site Planning",
-        dateRange: "Feb 16, 2025 - Mar 01, 2025",
-        description:
-          "Develop comprehensive site plans based on the environmental study and zoning restrictions.",
-        images: [IMAGES.milestone4, IMAGES.milestone2],
-      },
-    ],
-  },
-  {
-    id: "2",
-    phase: "Phase 2",
-    title: "Design Development",
-    startDate: new Date("2025-03-01"),
-    endDate: new Date("2025-03-15"),
-    milestones: [],
-  },
-];
 
 const MilestonePage = () => {
   usePageTitle("Milestone");
 
   const [search, setSearch] = React.useState("");
-  const [selectedMilestone, setSelectedMilestone] =
-    React.useState<MilestoneProps | null>(null);
+  const [assets, setAssets] = React.useState<MilestoneProps[]>([]);
+  const [selectedAssetId, setSelectedAssetId] = React.useState<string | null>(null);
+  const [filteredMilestones, setFilteredMilestones] = React.useState<ProjectPhase[] | null>(null)
+  const [selectedMilestone, setSelectedMilestone] = React.useState<ProjectPhase | null>(null);
 
-  const filteredMilestones = milestoneData.filter((milestone) =>
-    milestone.phase.toLowerCase().includes(search.toLowerCase())
-  );
+
+
+
+  const fetchAssets = async () => {
+    try {
+      const response = await assetApi.getAssetListingHavingMilestone();
+      if (response.success) {
+
+
+        const formattedAssets = response.data.data.assets.map((asset: any) => ({
+          id: asset.id,
+          projectName: asset.property_name,
+          milestones: asset.milestones?.map((milestone: any, index: number) => ({
+            phase_n: index + 1,
+            phase: milestone.phase_name,
+            title: asset.property_name,
+            dateRange: `${new Date(milestone.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} - ${new Date(milestone.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`,
+            description: milestone.activities,
+            images: milestone.media || [],
+          })) || []
+        }));
+
+
+        setAssets(formattedAssets);
+        if (formattedAssets.length > 0) {
+          setSelectedAssetId(formattedAssets[0].id); // Select first asset by default
+        }
+
+
+      }
+    } catch (error) {
+      console.error('Error fetching milestones:', error);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchAssets();
+  }, []);
+
+  React.useEffect(() => {
+    const asset = assets.find((asset) => asset.id == selectedAssetId);
+
+    if (selectedAssetId && asset) {
+      console.log(">>", asset);
+      setFilteredMilestones(asset
+        ? asset.milestones
+        : []);
+
+      console.log(filteredMilestones);
+
+    }
+  }, [selectedAssetId, assets]);
 
   return (
     <div className="md:grid grid-cols-5 gap-4">
@@ -93,17 +107,33 @@ const MilestonePage = () => {
               size={20}
               color="#777777"
             />
-            <Input
+            {/* <Input
               placeholder="Search"
               className="pl-10 rounded-xl h-8"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-            />
+            /> */}
+            <select
+              name="asset"
+              className="w-full rounded-xl h-8 border border-gray-300 px-2 pl-10 rounded-xl h-8"
+              onChange={(e) => setSelectedAssetId(e.target.value)}
+              value={selectedAssetId || ""}
+            >
+              <option value="" disabled>
+                Select asset
+              </option>
+              {assets?.map((asset: any) => (
+                <option key={asset.id} value={asset.id.toString()}>
+                  {asset.projectName}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
         <div className="space-y-4">
-          {filteredMilestones.map((milestone) => (
+
+          {filteredMilestones && filteredMilestones.map((milestone: any) => (
             <Card
               key={milestone.id}
               onClick={() => setSelectedMilestone(milestone)}
@@ -113,7 +143,7 @@ const MilestonePage = () => {
                 <div className="h-32 bg-gray-100 rounded-xl mb-2" />
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="text-xl font-medium text-slate-700">
-                    {milestone.phase}
+                    Phase {milestone.phase_n}
                   </h3>
                   <div className="flex gap-2">
                     <Button
@@ -130,9 +160,9 @@ const MilestonePage = () => {
                     </Button>
                   </div>
                 </div>
-                <p className="text-lg text-slate-600 mb-2">{milestone.title}</p>
+                <p className="text-lg text-slate-600 mb-2">{milestone.phase}</p>
                 <div className="text-sm text-gray-500">
-                  {formatDateRange(milestone.startDate, milestone.endDate)}
+                  {milestone.dateRange}
                 </div>
               </CardContent>
             </Card>
@@ -152,17 +182,17 @@ const MilestonePage = () => {
 
 export default MilestonePage;
 
-function MilestoneDetails({ milestone }: { milestone: MilestoneProps }) {
+function MilestoneDetails({ milestone }: { milestone: ProjectPhase }) {
   return (
     <div className="px-6">
       <h1 className="text-2xl font-medium text-gray-400 mb-1">Milestones</h1>
       <h2 className="text-sm text-gray-500 mb-6">
-        Cosgrove Greenview Apartments
+        {milestone?.title}
       </h2>
 
       <div className="flex max-md:flex-col items-center gap-4 mb-8">
         <div className="mb- relative">
-          <select
+          {/* <select
             name="phase"
             className="flex items-center justify-between w-64 px-4 py-1 rounded-lg border border-gray-300 text-gray-700 appearance-none"
             onChange={(e) => console.log(e.target.value)}
@@ -177,6 +207,7 @@ function MilestoneDetails({ milestone }: { milestone: MilestoneProps }) {
             color="#4a5565"
             className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none"
           />
+          */}
         </div>
         <div className="flex items-center gap-2">
           <Moneys size={20} color="#4a5565" />
@@ -188,55 +219,59 @@ function MilestoneDetails({ milestone }: { milestone: MilestoneProps }) {
         </div>
       </div>
 
-      {milestone.milestones?.map((milestoneItem, index) => (
-        <div key={index} className="flex items-center mb-16">
-          <div className="relative w-24 flex flex-col items-center">
-            <span className="text-sm font-semibold text-gray-700 mb-2">
-              {milestoneItem.phase}
-            </span>
-            {index !== (milestone.milestones?.length || 0) - 1 && (
-              <div className="w-px h-full bg-gray-300" />
-            )}
+
+      <div key={milestone.phase_n} className="flex items-center mb-16">
+        <div className="relative w-24 flex flex-col items-center">
+          <span className="text-sm font-semibold text-gray-700 mb-2">
+            Phase {milestone.phase_n}
+          </span>
+          {/* {index !== (milestone.milestones?.length || 0) - 1 && (
+            <div className="w-px h-full bg-gray-300" />
+          )} */}
+        </div>
+
+        <div className="flex-1 pl-4 text-[#667085]">
+          <div className="text-right">
+            <div className="font-medium">{milestone.title}</div>
+            <div className="text-sm">{milestone.dateRange}</div>
+            <p className="mt-2 max-w-md ml-auto">
+              {milestone.description}
+            </p>
           </div>
 
-          <div className="flex-1 pl-4 text-[#667085]">
-            <div className="text-right">
-              <div className="font-medium">{milestoneItem.title}</div>
-              <div className="text-sm">{milestoneItem.dateRange}</div>
-              <p className="mt-2 max-w-md ml-auto">
-                {milestoneItem.description}
-              </p>
-            </div>
-
-            <div className="flex md:flex-wrap gap-2 justify-end mt-4">
-              {milestoneItem.images.map((img, imgIndex) => (
-                <div key={imgIndex} className="relative">
-                  <img
-                    src={img}
-                    alt={`Milestone ${imgIndex + 1}`}
-                    className="w-24 h-16 object-cover rounded-md"
-                  />
-                  <button className="absolute -top-2 -left-2 bg-white rounded-full p-0.5">
-                    <CloseCircle size={16} color="#374151" />
-                  </button>
-                </div>
-              ))}
-            </div>
+          <div className="flex md:flex-wrap gap-2 justify-end mt-4">
+            {milestone.images.map((img: any, imgIndex) => (
+              <div key={imgIndex} className="relative">
+                <img
+                  src={`${import.meta.env.VITE_BASE_URL}/${img?.file || ''}`}
+                  alt={`Milestone ${imgIndex + 1}`}
+                  className="w-24 h-16 object-cover rounded-md"
+                />
+                <button className="absolute -top-2 -left-2 bg-white rounded-full p-0.5">
+                  <CloseCircle size={16} color="#374151" />
+                </button>
+              </div>
+            ))}
           </div>
         </div>
-      ))}
+      </div>
+
 
       <div className="flex max-md:flex-col gap-3 items-center justify-between py-4 border-t border-gray-200 mb-8">
         <div className="flex items-center gap-2">
           <Receipt size={20} className="text-gray-600" color="#4a5565" />
           <span className="font-medium text-gray-700">Milestone Status</span>
-          <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm flex items-center">
+          {/* <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm flex items-center">
             <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
             Completed
+          </span> */}
+          <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm flex items-center">
+            <span className="w-2 h-2 bg-orange-500 rounded-full mr-2" />
+            Pending
           </span>
         </div>
         <button className="bg-white border border-gray-300 px-4 py-1 shadow rounded-lg text-gray-700">
-          Funding Requested
+          Request Funding
         </button>
       </div>
 

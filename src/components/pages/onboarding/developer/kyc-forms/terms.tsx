@@ -14,15 +14,16 @@ import { ArrowLeft } from "iconsax-react";
 import KYCFormHeader from "./form-header";
 import { Checkbox } from "@/components/ui/checkbox";
 
+
 const KYBSchema = z.object({
-  developerAgreement: z.boolean().default(false).optional(),
-  // .refine((value) => value === true, {
-  //   message: "You must accept our terms",
-  // }),
-  accurateInformation: z.boolean().default(false).optional(),
-  // .refine((value) => value === true, {
-  //   message: "Confirm you inputted accurate data",
-  // }),
+  developerAgreement: z.boolean().default(false)
+    .refine((value) => value === true, {
+      message: "You must accept our terms",
+    }),
+  accurateInformation: z.boolean().default(false)
+    .refine((value) => value === true, {
+      message: "Confirm you inputted accurate data"
+    }),
   receiveNotification: z.boolean().default(false).optional(),
 });
 
@@ -216,7 +217,11 @@ const TermsForm = ({
                     <Checkbox
                       checked={field.value}
                       onCheckedChange={field.onChange}
-                    />
+
+                    >
+                      
+                    </Checkbox>
+
                   </FormControl>
                   <div className="space-y-1 leading-none">
                     <FormLabel className="font-light">

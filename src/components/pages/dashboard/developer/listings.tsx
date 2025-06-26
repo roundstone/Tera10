@@ -1,35 +1,80 @@
+import { useState, useEffect } from "react";
 import usePageTitle from "@/hooks/use-page-title";
 import { DocumentText, Receipt1, Wallet, Watch } from "iconsax-react";
 import { StatCard } from "./children/stat-card";
 import { Button } from "@/components/ui/button";
 import AssetsTable from "./children/assets-table";
+import { dashboardApi } from "@/api/dashboardApi";
 
-const stats = [
-  {
-    title: "Available Listing",
-    value: 24,
-    icon: <DocumentText size={18} color="#000" />,
-  },
-  {
-    title: "Approved",
-    value: 0,
-    currency: "NGN",
-    icon: <Wallet size={18} color="#000" />,
-  },
-  {
-    title: "Pending",
-    value: 4,
-    icon: <Receipt1 size={18} color="#000" />,
-  },
-  {
-    title: "Flagged",
-    value: 5,
-    icon: <Watch size={18} color="#000" />,
-  },
-];
+
 
 const ListingPage = () => {
   usePageTitle("Listings");
+
+  const [stats, setStats] = useState([
+    {
+      title: "Available Listing",
+      value: 0,
+      icon: <DocumentText size={18} color="#000" />,
+    },
+    {
+      title: "Approved",
+      value: 0,
+      currency: "NGN",
+      icon: <Wallet size={18} color="#000" />,
+    },
+    {
+      title: "Pending",
+      value: 0,
+      icon: <Receipt1 size={18} color="#000" />,
+    },
+    {
+      title: "Flagged",
+      value: 0,
+      icon: <Watch size={18} color="#000" />,
+    },
+  ]);
+
+
+  const fetchStats = async () => {
+    try {
+      const response = await dashboardApi.getListingStats();
+      if (response.success) {
+
+        setStats([
+          {
+            title: "Available Listing",
+            value: response.data?.data.total_assets,
+            icon: <DocumentText size={18} color="#000" />,
+          },
+          {
+            title: "Approved",
+            value: response.data?.data.approved,
+            currency: "NGN",
+            icon: <Wallet size={18} color="#000" />,
+          },
+          {
+            title: "Pending",
+            value: response.data?.data.pending,
+            icon: <Receipt1 size={18} color="#000" />,
+          },
+          {
+            title: "Flagged",
+            value: response.data?.data.declined,
+            icon: <Watch size={18} color="#000" />,
+          },
+        ])
+
+
+      }
+    } catch (error) {
+      console.error('Error fetching milestones:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
 
   return (
     <>

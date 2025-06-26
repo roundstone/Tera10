@@ -18,3 +18,13 @@ export function maskEmail(email: string): string {
 
   return `${visible}${masked}@${domain}`;
 }
+
+export function formatDateForLaravel(dateInput: Date | string): string {
+  const jsDate = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+  console.log("jsDate>>",jsDate);
+  const year = jsDate.getFullYear();
+  const month = String(jsDate.getMonth() + 1).padStart(2, '0'); // months are zero-based
+  const day = String(jsDate.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+}

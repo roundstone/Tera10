@@ -13,6 +13,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft } from "iconsax-react";
 import { FileUploader } from "@/components/ui/file";
+import { useRegistration } from '../../../../../context/RegistrationContext';
+import { registrationApi } from '../../../../../api/registrationApi';
 // import { FileUploader } from "@/components/ui/file-uploader";
 
 const KYBSchema = z.object({
@@ -32,6 +34,7 @@ const ContactPersonForm = ({
   onFinish: () => void;
   onPrevious: () => void;
 }) => {
+  const { state, dispatch } = useRegistration();
   const form = useForm<z.infer<typeof KYBSchema>>({
     resolver: zodResolver(KYBSchema),
     defaultValues: {
@@ -42,12 +45,41 @@ const ContactPersonForm = ({
     },
   });
 
-  function onSubmit(data: z.infer<typeof KYBSchema>) {
-    // toast.success("Business identity submitted successfully!");
-    console.log(data);
-    // goTo("/next-step");
-    onFinish();
-  }
+  const onSubmit = async (formData: z.infer<typeof KYBSchema>) => {
+    try {
+
+      dispatch({ type: 'SET_LOADING', payload: true });
+      dispatch({ type: 'SET_ERROR', payload: null });
+
+      const data = new FormData();
+      data.append('contact_name', formData.fullName);
+      data.append('contact_position', formData.position);
+      data.append('contact_email', formData.email);
+      data.append('contact_phone', formData.phoneNumber);
+
+      if (formData.governmentIssuedId) {
+        data.append('contact_id', formData.governmentIssuedId);
+      }
+
+
+      const response = await registrationApi.submitStep3(state.userId!, data);
+
+      if (response.success) {
+        dispatch({ type: 'SET_STEP_DATA', payload: { step: 3, data: data } });
+        dispatch({ type: 'SET_CURRENT_STEP', payload: 4 });
+        //goTo(ROUTES.ONBOARDING.DEVELOPER.VERIFY_EMAIL);
+        onFinish();
+      } else {
+        dispatch({ type: 'SET_ERROR', payload: response.message });
+      }
+    } catch (error) {
+      console.log("error>>", error);
+      dispatch({ type: 'SET_ERROR', payload: 'An error occurred' });
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  };
+
 
   return (
     <div className="py-10">

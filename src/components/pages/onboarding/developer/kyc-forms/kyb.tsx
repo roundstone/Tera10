@@ -21,6 +21,11 @@ import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CIcon } from "iconsax-react";
 import { cn } from "@/lib/utils";
 import { FileUploader } from "@/components/ui/file";
+import { useRegistration } from '../../../../../context/RegistrationContext';
+import { registrationApi } from '../../../../../api/registrationApi';
+import { useNavigation } from '../../../../../utils/navigation';
+import { ROUTES } from '../../../../../config/route';
+import { formatDateForLaravel } from '../../../../../utils/string';
 // import { FileUploader } from "@/components/ui/file-uploader";
 
 const KYBSchema = z.object({
@@ -49,12 +54,14 @@ const KYBSchema = z.object({
   //         message: "Invalid date format (use dd/mm/yyyy)",
   //       }
   //     ),
-  cacCertificate: z.any().refine((file) => file?.size <= 800000, {
-    message: "File size must be less than 800KB",
+  cacCertificate: z.any().refine((file) => file?.size <= 8000000, {
+    message: "File size must be less than 8000KB",
   }),
 });
 
-const KYBForm = ({ onFinish }: { onFinish: () => void }) => {
+const KYBForm = ({ onFinish, onPrevious }: { onFinish: () => void, onPrevious: () => void }) => {
+  const { state, dispatch } = useRegistration();
+  const { goTo } = useNavigation();
   const form = useForm<z.infer<typeof KYBSchema>>({
     resolver: zodResolver(KYBSchema),
     defaultValues: {
@@ -67,12 +74,46 @@ const KYBForm = ({ onFinish }: { onFinish: () => void }) => {
     },
   });
 
-  function onSubmit(data: z.infer<typeof KYBSchema>) {
-    // toast.success("Business identity submitted successfully!");
-    console.log(data);
-    // goTo("/next-step");
-    onFinish();
-  }
+
+
+  const onSubmit = async (formData: z.infer<typeof KYBSchema>) => {
+    try {
+
+      dispatch({ type: 'SET_LOADING', payload: true });
+      dispatch({ type: 'SET_ERROR', payload: null });
+
+      const data = new FormData();
+      data.append('name', formData.companyName);
+      data.append('entity_type', formData.entityType);
+      data.append('registration_number', formData.registrationNumber);
+      data.append('country_incorporation', formData.country);
+
+      if (formData.incorporationDate) {
+        data.append('date_incorporation', formatDateForLaravel(formData.incorporationDate));
+      }
+
+      if (formData.cacCertificate && formData.cacCertificate) {
+        // assuming it's an array from file input
+        data.append('cac_certificate', formData.cacCertificate); // File object
+      }
+
+      const response = await registrationApi.submitStep2(state.userId!, data);
+
+      if (response.success) {
+        dispatch({ type: 'SET_STEP_DATA', payload: { step: 2, data: data } });
+        dispatch({ type: 'SET_CURRENT_STEP', payload: 3 });
+        //goTo(ROUTES.ONBOARDING.DEVELOPER.VERIFY_EMAIL);
+        onFinish();
+      } else {
+        dispatch({ type: 'SET_ERROR', payload: response.message });
+      }
+    } catch (error) {
+      console.log("error>>", error);
+      dispatch({ type: 'SET_ERROR', payload: 'An error occurred' });
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  };
 
   return (
     <div className="py-10">
@@ -221,8 +262,12 @@ const KYBForm = ({ onFinish }: { onFinish: () => void }) => {
               Proceed
             </Button>
           </div>
+
         </form>
+
       </Form>
+      {state.loading && <div>Loading...</div>}
+      {state.error && <div className="error">{state.error}</div>}
     </div>
   );
 };

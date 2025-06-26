@@ -1,11 +1,13 @@
-import { useNavigation } from "@/utils/navigation";
-import IMAGES from "@/assets/images";
-import { ROUTES } from "@/config/route";
+import { useNavigation } from "../../../../utils/navigation";
+import IMAGES from "../../../../assets/images";
+import { ROUTES } from "../../../../config/route";
 import { maskEmail } from "../../../../utils/string";
 import { useEffect } from "react";
+import { useRegistration } from '../../../../context/RegistrationContext';
 
 const DeveloperOnboardingVEmail = () => {
   const { goTo } = useNavigation();
+  const { state, dispatch } = useRegistration();
 
   // Auto redirect after 5 seconds
   useEffect(() => {
@@ -27,7 +29,7 @@ const DeveloperOnboardingVEmail = () => {
         <div className="flex flex-col items-center justify-center">
           <img src={IMAGES.EmailBird} className="w-[402px] h-[402px]" alt="" />
           <div className="text-2xl text-center">
-            {maskEmail("mosesdavid@gmail.com")}
+            {maskEmail(state.formData.step1?.email || "")}
           </div>
         </div>
         <p className="text-sm pt-15">This page will reload automatically</p>

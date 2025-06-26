@@ -14,6 +14,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { FileUploader } from "@/components/ui/file";
 import KYCFormHeader from "./form-header";
 import { ArrowLeft } from "iconsax-react";
+import { useRegistration } from '../../../../../context/RegistrationContext';
+import { registrationApi } from '../../../../../api/registrationApi';
 
 const KYBSchema = z.object({
   companyAddress: z.string().min(1, "Company address is required"),
@@ -40,6 +42,7 @@ const BusinessAddressForm = ({
   onFinish: () => void;
   onPrevious: () => void;
 }) => {
+  const { state, dispatch } = useRegistration();
   const form = useForm<z.infer<typeof KYBSchema>>({
     resolver: zodResolver(KYBSchema),
     defaultValues: {
@@ -56,10 +59,46 @@ const BusinessAddressForm = ({
     },
   });
 
-  function onSubmit(data: z.infer<typeof KYBSchema>) {
-    console.log(data);
-    onFinish();
-  }
+  const onSubmit = async (formData: z.infer<typeof KYBSchema>) => {
+    try {
+
+      dispatch({ type: 'SET_LOADING', payload: true });
+      dispatch({ type: 'SET_ERROR', payload: null });
+
+      const data = new FormData();
+      data.append('address', formData.companyAddress);
+      data.append('city', formData.city);
+      data.append('state', formData.state);
+      data.append('postcode', formData.postalCode);
+      data.append('country', formData.country);
+      data.append('bank_name', formData.bankName);
+      data.append('bank_account_number', formData.bankAccountNumber);
+      data.append('bvn', formData.bvn);
+      data.append('account_type', formData.accountType);
+      
+
+      if (formData.governmentIssuedId) {
+        data.append('business_id', formData.governmentIssuedId);
+      }
+
+
+      const response = await registrationApi.submitStep4(state.userId!, data);
+
+      if (response.success) {
+        dispatch({ type: 'SET_STEP_DATA', payload: { step: 4, data: data } });
+        dispatch({ type: 'SET_CURRENT_STEP', payload: 5 });
+        //goTo(ROUTES.ONBOARDING.DEVELOPER.VERIFY_EMAIL);
+        onFinish();
+      } else {
+        dispatch({ type: 'SET_ERROR', payload: response.message });
+      }
+    } catch (error) {
+      console.log("error>>", error);
+      dispatch({ type: 'SET_ERROR', payload: 'An error occurred' });
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  };
 
   return (
     <div className="py-10">

@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { useNavigation } from "@/utils/navigation";
 import { ROUTES } from "@/config/route";
 import { Link } from "react-router-dom";
+import { authApi } from "@/api/authApi";
 
 const FormSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -31,7 +32,18 @@ const LoginForm = () => {
     },
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    const fdata = new FormData();
+    fdata.append('email', data.email);
+    fdata.append('password', data.password);
+
+    const response = await authApi.login(fdata);
+    if (response.success) {
+      localStorage.setItem("token", response.data?.token);
+      localStorage.setItem("userId", response.data?.user.id);
+      localStorage.setItem("email", response.data?.user.email);
+      localStorage.setItem("name", response.data?.user.first_name);
+    }
     toast.success("Login successful!");
     console.log(data);
     goTo(ROUTES.DASHBOARD.DEVELOPER.HOME);

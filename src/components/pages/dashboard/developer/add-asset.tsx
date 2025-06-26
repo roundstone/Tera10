@@ -7,20 +7,15 @@ import { useState } from "react";
 //   FormLabel,
 //   FormMessage,
 // } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { ArrowLeft2, Buildings2 } from "iconsax-react";
+
+import { ArrowLeft2 } from "iconsax-react";
 import { PricingForm } from "./children/add-asset-form/pricing";
 import BasicForm from "./children/add-asset-form/basic";
 import MilestonesForm from "./children/add-asset-form/milestone";
 import PreviewSubmit from "./children/add-asset-form/review";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { AssetProvider } from "@/context/AssetContext";
 
 const steps = ["Basic", "Pricing", "Milestones", "Submit"];
 
@@ -34,6 +29,9 @@ const AddAssetPage = () => {
 
   const prevStep = () => setStep((prev) => Math.max(prev - 1, 0));
 
+  const gotoStep = async (stp: number) =>
+    setStep(stp);
+
   // const onSubmit = (data: FormData) => {
   //   toast.success("Asset submitted!");
   //   console.log("Full Submission:", { data, ...files });
@@ -44,42 +42,31 @@ const AddAssetPage = () => {
       case 0:
         return <BasicForm onFinish={nextStep} />;
       case 1:
-        return <PricingForm onFinish={nextStep} onPrevious={prevStep} />;
+        return <PricingForm onFinish={nextStep} onPrevious={prevStep} gotoStep={gotoStep} />;
       case 2:
         return <MilestonesForm onFinish={nextStep} onPrevious={prevStep} />;
       case 3:
-        return <PreviewSubmit />;
+        return <PreviewSubmit gotoStep={gotoStep} />;
     }
   };
 
   return (
-    <div className="">
-      <div className="max-w-3xl mx-auto space-y-6">
-        <div className="flex gap-3 text-gray-500 items-center font-semibold">
-          <Button
-            variant="ghost"
-            onClick={() => navigate(-1)}
-            className="bg-gray-100 border border-gray-200 rounded-full p-5"
-          >
-            <ArrowLeft2 color="#888888" size={18} />
-          </Button>
-          <span>Add New Asset</span>
-        </div>
+    <AssetProvider>
+      <div className="">
+        <div className="max-w-3xl mx-auto space-y-6">
+          <div className="flex gap-3 text-gray-500 items-center font-semibold">
+            <Button
+              variant="ghost"
+              onClick={() => navigate(-1)}
+              className="bg-gray-100 border border-gray-200 rounded-full p-5"
+            >
+              <ArrowLeft2 color="#888888" size={18} />
+            </Button>
+            <span>Add New Asset</span>
+          </div>
 
-        <Select>
-          <SelectTrigger className="w-[320px]">
-            <SelectValue placeholder="Select a property type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="React Estate">
-              <Buildings2 color="#888888" size={32} /> React Estate
-            </SelectItem>
-            <SelectItem value="Land">
-              <Buildings2 color="#888888" size={32} /> Land
-            </SelectItem>
-          </SelectContent>
-        </Select>
-        {/* <FormField
+
+          {/* <FormField
         // control={form.control}
         name="propertyType"
         render={({ field }) => (
@@ -104,32 +91,32 @@ const AddAssetPage = () => {
         )}
       /> */}
 
-        <div className="flex items-center gap-8 text-sm">
-          {steps.map((label, index) => (
-            <span
-              key={label}
-              className={`${
-                step === index
+          <div className="flex items-center gap-8 text-sm">
+            {steps.map((label, index) => (
+              <span
+                key={label}
+                className={`${step === index
                   ? "text-green-600 font-medium"
                   : index < step
                     ? "bggray-400  text-green-700"
                     : " text-gray-400"
-              }`}
-            >
-              ● {label}
-            </span>
-          ))}
-        </div>
+                  }`}
+              >
+                ● {label}
+              </span>
+            ))}
+          </div>
 
-        {/* select */}
-        {/* Step Title  Preview & Submit*/}
-        <h2 className="text-xl font-semibold mb-6">
-          {steps[step] == "Submit" ? " Preview & Submit" : steps[step]}
-        </h2>
+          {/* select */}
+          {/* Step Title  Preview & Submit*/}
+          <h2 className="text-xl font-semibold mb-6">
+            {steps[step] == "Submit" ? " Preview & Submit" : steps[step]}
+          </h2>
+        </div>
+        {/* Step Form */}
+        {renderStep()}
       </div>
-      {/* Step Form */}
-      {renderStep()}
-    </div>
+    </AssetProvider>
   );
 
   return <>{/* <AddAssetForm /> */}</>;
