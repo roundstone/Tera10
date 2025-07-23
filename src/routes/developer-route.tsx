@@ -13,6 +13,7 @@ import DeveloperOnboardingVEmailPage from "@/features/onboarding/developer/verif
 import DeveloperOnboardingConsoleOverviewPage from "@/features/onboarding/developer/console";
 import DeveloperOnboardingKYCPage from "@/features/onboarding/developer/kyc";
 import DeveloperOnboardingKYCConfirmationPage from "@/features/onboarding/developer/thank-you";
+import Profile from "@/features/dashboard/developer/profile";
 
 export const developerRoutes: CustomRouteObject[] = [
   // Onboarding
@@ -71,6 +72,11 @@ export const developerRoutes: CustomRouteObject[] = [
   {
     path: ROUTES.DASHBOARD.DEVELOPER.WALLET,
     element: <Wallet />,
+    layout: DashboardLayout,
+  },
+  {
+    path: ROUTES.DASHBOARD.DEVELOPER.PROFILE,
+    element: <Profile />,
     layout: DashboardLayout,
   },
 ];

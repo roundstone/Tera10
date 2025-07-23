@@ -67,11 +67,11 @@ const items: MenuItems = {
       to: ROUTES.DASHBOARD.DEVELOPER.WALLET,
       icon: Wallet3,
     },
-    // {
-    //   title: "Profile",
-    //   to: ROUTES.DASHBOARD.DEVELOPER.PROFILE,
-    //   icon: User,
-    // },
+    {
+      title: "Profile",
+      to: ROUTES.DASHBOARD.DEVELOPER.PROFILE,
+      icon: User,
+    },
   ],
   MANAGER: [
     {
